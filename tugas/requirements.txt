@@ -1,8 +1,0 @@
-Flask==2.3.3
-numpy
-pandas
-matplotlib
-joblib
-librosa
-scikit-learn
-gunicorn
