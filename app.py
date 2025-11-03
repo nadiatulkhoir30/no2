@@ -1,11 +1,14 @@
 import streamlit as st
+
+# ⚡ HARUS DI ATAS SEMUA COMPONENT STREAMLIT
+st.set_page_config(page_title="Prediksi NO₂", layout="centered")
+
 import pandas as pd
 import numpy as np
 import joblib
 import matplotlib
-matplotlib.use('Agg')
+matplotlib.use('Agg')  # Supaya matplotlib aman di server
 import matplotlib.pyplot as plt
-
 
 # ---------------------------
 # Load model & scaler
@@ -41,7 +44,6 @@ except:
 # ---------------------------
 # Header aplikasi
 # ---------------------------
-st.set_page_config(page_title="Prediksi NO₂", layout="centered")
 st.markdown(
     """
     <div style="text-align:center">
@@ -55,9 +57,9 @@ st.markdown(
 # Input nilai NO2
 # ---------------------------
 col1, col2, col3 = st.columns(3)
-t3_default = float(df['NO2'].values[-3]) if df is not None else 0.0
-t2_default = float(df['NO2'].values[-2]) if df is not None else 0.0
-t1_default = float(df['NO2'].values[-1]) if df is not None else 0.0
+t3_default = float(df['NO2'].values[-3]) if df is not None and len(df) >= 3 else 0.0
+t2_default = float(df['NO2'].values[-2]) if df is not None and len(df) >= 2 else 0.0
+t1_default = float(df['NO2'].values[-1]) if df is not None and len(df) >= 1 else 0.0
 
 with col1:
     t3 = st.number_input("NO₂(t-3)", value=t3_default, format="%.8f")
@@ -81,13 +83,13 @@ if st.button("Prediksi NO₂"):
     # ---------------------------
     # Plot tren NO2
     # ---------------------------
-    fig, ax = plt.subplots(figsize=(8,4))
-    if df is not None:
+    if df is not None and len(df) >= 3:
+        fig, ax = plt.subplots(figsize=(8,4))
         ax.plot(df.index, df['NO2'], label='NO₂ harian', marker='o')
         ax.plot(df.index[-3:], df['NO2'].values[-3:], color='red', marker='o', linestyle='', label='3 hari terakhir')
         ax.scatter(df.index[-1]+1, pred_value, color=color, s=100, label='Prediksi')
-    ax.set_xlabel("Hari")
-    ax.set_ylabel("NO₂ (ppm)")
-    ax.set_title("Tren NO₂ Harian")
-    ax.legend()
-    st.pyplot(fig)
+        ax.set_xlabel("Hari")
+        ax.set_ylabel("NO₂ (ppm)")
+        ax.set_title("Tren NO₂ Harian")
+        ax.legend()
+        st.pyplot(fig)
